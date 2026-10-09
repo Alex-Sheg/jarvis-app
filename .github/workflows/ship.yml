@@ -12,7 +12,7 @@ on:
 
 jobs:
   detect:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       has_python: ${{ steps.check.outputs.has_python }}
       has_web: ${{ steps.check.outputs.has_web }}
@@ -39,7 +39,7 @@ jobs:
   build-wheel:
     needs: detect
     if: needs.detect.outputs.has_python == 'true' && contains(github.event.inputs.targets || 'apk,pip,pages', 'pip')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
@@ -78,7 +78,7 @@ jobs:
   build-apk:
     needs: detect
     if: needs.detect.outputs.has_python == 'true' && contains(github.event.inputs.targets || 'apk,pip,pages', 'apk')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 180
     steps:
       - name: Checkout
@@ -132,7 +132,7 @@ jobs:
   deploy-pages:
     needs: detect
     if: (needs.detect.outputs.has_web == 'true' || needs.detect.outputs.has_python == 'true') && contains(github.event.inputs.targets || 'apk,pip,pages', 'pages')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       pages: write
