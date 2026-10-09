@@ -9,25 +9,13 @@ version = 0.1
 requirements = python3,kivy,plyer,requests,jnius
 
 android.permissions = INTERNET, RECORD_AUDIO, WAKE_LOCK, FOREGROUND_SERVICE
-
 android.api = 33
 android.minapi = 21
 android.archs = arm64-v8a, armeabi-v7a
 android.allow_backup = True
+android.accept_sdk_license = True
+android.skip_update = False
+android.build_tools_version = 34.0.0
+android.ndk = 25b
 
 orientation = portrait
-
-android.accept_sdk_license = True
-android.skip_update = False
-
-# --- Исправление для стабильной сборки ---
-android.accept_sdk_license = True
-android.skip_update = False
-android.build_tools_version = 34.0.0
-android.ndk = 25b
-
-# --- Принудительные настройки для стабильной сборки ---
-android.accept_sdk_license = True
-android.skip_update = False
-android.build_tools_version = 34.0.0
-android.ndk = 25b
