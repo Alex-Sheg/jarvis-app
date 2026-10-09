@@ -27,42 +27,38 @@ jobs:
             pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev \
             libtinfo6 cmake libffi-dev libssl-dev
 
-      - name: Accept Android SDK licenses
-        run: |
-          # Принудительно принимаем все лицензии
-          mkdir -p $HOME/.android
-          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
-          echo "y" | $ANDROID_HOME/tools/bin/sdkmanager --licenses || true
-          # Создаём файлы лицензий вручную (проверенный метод)
-          mkdir -p $HOME/.buildozer/android/platform/android-sdk/licenses
-          echo "8933bad161af4b6a5b573652ffc7aaf3aee85a47" > $HOME/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
-          echo "d56f5187479451eabf01fb78af6dfcb131b33910" > $HOME/.buildozer/android/platform/android-sdk/licenses/android-sdk-preview-license
-          echo "84831b9409646a918e30573bab4c9c91346d8abd" > $HOME/.buildozer/android/platform/android-sdk/licenses/google-tv-preview-license
-
       - name: Install buildozer
         run: |
           pip install --user buildozer cython
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
+      - name: Fix sdkmanager path (symlink)
+        run: |
+          SDK_DIR="$HOME/.buildozer/android/platform/android-sdk"
+          # Если папки еще нет — создаем
+          mkdir -p "$SDK_DIR/tools/bin"
+          mkdir -p "$SDK_DIR/cmdline-tools/latest/bin"
+          # Ищем sdkmanager и создаем симлинк туда, где его ждет Buildozer
+          if [ -f "$SDK_DIR/cmdline-tools/latest/bin/sdkmanager" ]; then
+            ln -sf "$SDK_DIR/cmdline-tools/latest/bin/sdkmanager" "$SDK_DIR/tools/bin/sdkmanager"
+          elif [ -f "$SDK_DIR/cmdline-tools/bin/sdkmanager" ]; then
+            ln -sf "$SDK_DIR/cmdline-tools/bin/sdkmanager" "$SDK_DIR/tools/bin/sdkmanager"
+          fi
+          echo "Symlink created."
+
+      - name: Accept Android SDK licenses
+        run: |
+          SDK_DIR="$HOME/.buildozer/android/platform/android-sdk"
+          mkdir -p "$SDK_DIR/licenses"
+          echo "8933bad161af4b6a5b573652ffc7aaf3aee85a47" > "$SDK_DIR/licenses/android-sdk-license"
+          echo "d56f5187479451eabf01fb78af6dfcb131b33910" > "$SDK_DIR/licenses/android-sdk-preview-license"
+          echo "84831b9409646a918e30573bab4c9c91346d8abd" > "$SDK_DIR/licenses/google-tv-preview-license"
+
       - name: Build APK
         run: |
+          export ANDROID_SDK_ROOT="$HOME/.buildozer/android/platform/android-sdk"
           yes | buildozer -v android debug
         timeout-minutes: 150
-
-      - name: Fix Aidl (копирование в build-tools)
-        if: always()
-        run: |
-          # Находим папку build-tools и копируем туда aidl, если его нет
-          BUILD_TOOLS_DIR="$HOME/.buildozer/android/platform/android-sdk/build-tools"
-          if [ -d "$BUILD_TOOLS_DIR" ]; then
-            # Находим самую свежую версию
-            LATEST_TOOLS=$(ls -1 "$BUILD_TOOLS_DIR" | sort -V | tail -1)
-            if [ -n "$LATEST_TOOLS" ] && [ ! -f "$BUILD_TOOLS_DIR/$LATEST_TOOLS/aidl" ]; then
-              echo "Копирую aidl в $BUILD_TOOLS_DIR/$LATEST_TOOLS/"
-              cp /usr/bin/aidl "$BUILD_TOOLS_DIR/$LATEST_TOOLS/" || true
-              chmod +x "$BUILD_TOOLS_DIR/$LATEST_TOOLS/aidl" || true
-            fi
-          fi
 
       - name: Show APK outputs
         if: always()

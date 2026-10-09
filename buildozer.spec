@@ -17,5 +17,7 @@ android.accept_sdk_license = True
 android.skip_update = False
 android.build_tools_version = 34.0.0
 android.ndk = 25b
+android.sdk_path = /home/runner/.buildozer/android/platform/android-sdk
+android.ndk_path = /home/runner/.buildozer/android/platform/android-ndk-r25b
 
 orientation = portrait
