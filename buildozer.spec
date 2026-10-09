@@ -25,3 +25,9 @@ android.accept_sdk_license = True
 android.skip_update = False
 android.build_tools_version = 34.0.0
 android.ndk = 25b
+
+# --- Принудительные настройки для стабильной сборки ---
+android.accept_sdk_license = True
+android.skip_update = False
+android.build_tools_version = 34.0.0
+android.ndk = 25b
