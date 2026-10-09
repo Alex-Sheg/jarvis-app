@@ -27,6 +27,17 @@ jobs:
             pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev \
             libtinfo6 cmake libffi-dev libssl-dev
 
+      - name: Accept Android SDK licenses
+        run: |
+          # Предварительно принимаем все лицензии
+          mkdir -p $HOME/.android
+          echo "y" | $ANDROID_HOME/tools/bin/sdkmanager --licenses || true
+          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+          # Принудительно создаём файлы лицензий
+          mkdir -p $HOME/.buildozer/android/platform/android-sdk/licenses
+          echo "8933bad161af4b6a5b573652ffc7aaf3aee85a47" > $HOME/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+          echo "d56f5187479451eabf01fb78af6dfcb131b33910" > $HOME/.buildozer/android/platform/android-sdk/licenses/android-sdk-preview-license
+
       - name: Install buildozer
         run: |
           pip install --user buildozer cython
@@ -34,7 +45,7 @@ jobs:
 
       - name: Build APK
         run: |
-          buildozer -v android debug
+          yes | buildozer -v android debug
         timeout-minutes: 150
 
       - name: Show APK outputs
