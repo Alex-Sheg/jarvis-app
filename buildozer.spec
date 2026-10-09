@@ -6,7 +6,7 @@ source.dir = .
 source.include_exts = py,png,jpg,kv,atlas
 version = 0.1
 
-requirements = python3,kivy,plyer,requests,pyjnius
+requirements = python3,kivy,plyer,requests,jnius
 
 android.permissions = INTERNET, RECORD_AUDIO, WAKE_LOCK, FOREGROUND_SERVICE
 
